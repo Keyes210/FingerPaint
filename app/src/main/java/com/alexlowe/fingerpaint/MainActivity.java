@@ -5,6 +5,11 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+
+//TODO: Add Nav drawer to select colors and stroke size
+//TODO: Add settings menu to change background color
+//TODO: Add Share button
+
 public class MainActivity extends AppCompatActivity {
 
     @Override

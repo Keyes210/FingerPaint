@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Point;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
@@ -24,7 +25,7 @@ public class DrawingView extends View {
     // Store circles to draw each time the user touches down
     private List<Point> circlePoints;
 
-    
+    private Path path = new Path();
 
     public DrawingView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -37,29 +38,40 @@ public class DrawingView extends View {
         drawPaint.setColor(paintColor);
         drawPaint.setAntiAlias(true);
         drawPaint.setStrokeWidth(5);
-        drawPaint.setStyle(Paint.Style.FILL);
+        drawPaint.setStyle(Paint.Style.STROKE);
         drawPaint.setStrokeJoin(Paint.Join.ROUND);
         drawPaint.setStrokeCap(Paint.Cap.ROUND);
     }
 
-    // Draw each circle onto the view
+    // Draws the path created during the touch events
     @Override
     protected void onDraw(Canvas canvas) {
-        for(Point p : circlePoints){
-            canvas.drawCircle(p.x, p.y, 5, drawPaint);
-        }
+        canvas.drawPath(path, drawPaint);
     }
 
-    // Append new circle each time user presses on screen
 
+    // Get x and y and append them to the path
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
+    public boolean onTouchEvent(@NonNull MotionEvent event) {
         float touchX = event.getX();
         float touchY = event.getY();
-        circlePoints.add(new Point(Math.round(touchX), Math.round(touchY)));
+        // Checks for the event that occurs
+        switch (event.getAction()){
+            case MotionEvent.ACTION_DOWN:
+                // Starts a new line in the path
+                path.moveTo(touchX, touchY);
+                break;
+            case MotionEvent.ACTION_MOVE:
+                // Draws line between last point and this point
+                path.lineTo(touchX, touchY);
+                break;
+            default:
+                return false;
+        }
 
         // indicate view should be redrawn
         postInvalidate();
+        // Indicate we've consumed the touch
         return true;
     }
 }
